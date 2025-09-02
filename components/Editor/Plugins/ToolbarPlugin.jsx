@@ -42,7 +42,6 @@ import ColorPlugin from "./ColorPlugin";
 import ListPlugin from "./ListPlugin";
 import { $isListNode, ListNode } from "@lexical/list";
 import { cn } from "@/lib/utils";
-import { TablePlugin } from "./TablePlugin";
 import { Trash2, Info } from "lucide-react";
 import {
   $getTableCellNodeFromLexicalNode,
@@ -56,6 +55,7 @@ import {
   $getTableNodeFromLexicalNodeOrThrow,
   $isTableSelection,
 } from "@lexical/table";
+import { InsertTableDialog } from "./TablePlugin";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -453,7 +453,7 @@ export default function ToolbarPlugin() {
         <ColorPlugin />
         <ListPlugin blockType={blockType} setBlockType={setBlockType} />
 
-        <TablePlugin activeEditor={activeEditor} />
+        <InsertTableDialog activeEditor={activeEditor} onClose={() => {}} />
 
         <Button
           variant={"outline"}
@@ -463,77 +463,6 @@ export default function ToolbarPlugin() {
           <Trash2 />
         </Button>
       </div>
-
-      {/* Enhanced table information and shortcuts */}
-      {isInTable && (
-        <div className="border rounded-lg p-3 bg-blue-50 border-blue-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Info className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800">
-              Table Mode
-            </span>
-            <Badge variant="secondary" className="text-xs">
-              {tableInfo.rows}×{tableInfo.cols}
-            </Badge>
-            {tableInfo.selectedCells > 1 && (
-              <Badge variant="default" className="text-xs">
-                {tableInfo.selectedCells} cells selected
-              </Badge>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">
-            <div className="space-y-1">
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Ctrl+Shift+↑
-                </kbd>{" "}
-                Insert row above
-              </div>
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Ctrl+Shift+↓
-                </kbd>{" "}
-                Insert row below
-              </div>
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Ctrl+Shift+←
-                </kbd>{" "}
-                Insert column left
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Ctrl+Shift+→
-                </kbd>{" "}
-                Insert column right
-              </div>
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Alt+Del
-                </kbd>{" "}
-                Delete row
-              </div>
-              <div>
-                <kbd className="px-1 py-0.5 bg-white rounded text-xs">
-                  Ctrl+M
-                </kbd>{" "}
-                Merge/Unmerge cells
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-2 pt-2 border-t border-blue-200">
-            <p className="text-xs text-blue-600">
-              💡 <strong>Tip:</strong> Select multiple cells by dragging, then
-              click merge or use Ctrl+M. Use + Row/Col buttons for quick
-              insertion.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -10,18 +10,19 @@ import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin"; // Add this import
-// import { TableSelectionPlugin } from "@lexical/react/LexicalTableSelectionPlugin";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { css } from "@emotion/css";
-import { useState } from "react";
-
 // Import your custom plugins
 import ToolbarPlugin from "./Plugins/ToolbarPlugin";
 import OnChangePlugin from "./Plugins/OnChangePlugin";
 import { TableContext } from "./Plugins/TablePlugin"; // Import the context
 import ClearEditorPlugin from "./Plugins/ClearEditorPlugin";
 import Form from "../Form";
+import TableCellResizerPlugin from "./Plugins/TableCellResizer";
+import TableHoverActionsPlugin from "./Plugins/TableHoverActionsPlugin";
+import { useState } from "react";
+// import TableActionMenuPlugin from "./Plugins/TableActionMenuPlugin";
 
 const initialConfig = {
   nameSpace: "Rich Text Editor",
@@ -47,12 +48,26 @@ const initialConfig = {
       code: "bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
     },
     // Add table theme with better styling
-    // table: "border-collapse border-2 border-gray-300 w-full",
-    // tableCell: "border border-gray-300 p-3 min-w-20 relative",
-    // tableCellHeader:
-    //   "border border-gray-300 p-3 min-w-20 bg-gray-50 font-semibold text-center",
-    // tableRow: "border-b border-gray-300",
-    // tableSelection: "bg-blue-100",
+    table: "PlaygroundEditorTheme__table",
+    tableAddColumns: "PlaygroundEditorTheme__tableAddColumns",
+    tableAddRows: "PlaygroundEditorTheme__tableAddRows",
+    tableAlignment: {
+      center: "PlaygroundEditorTheme__tableAlignmentCenter",
+      right: "PlaygroundEditorTheme__tableAlignmentRight",
+    },
+    tableCell: "PlaygroundEditorTheme__tableCell",
+    tableCellActionButton: "PlaygroundEditorTheme__tableCellActionButton",
+    tableCellActionButtonContainer:
+      "PlaygroundEditorTheme__tableCellActionButtonContainer",
+    tableCellHeader: "PlaygroundEditorTheme__tableCellHeader",
+    tableCellResizer: "PlaygroundEditorTheme__tableCellResizer",
+    tableCellSelected: "PlaygroundEditorTheme__tableCellSelected",
+    tableFrozenColumn: "PlaygroundEditorTheme__tableFrozenColumn",
+    tableFrozenRow: "PlaygroundEditorTheme__tableFrozenRow",
+    tableRowStriping: "PlaygroundEditorTheme__tableRowStriping",
+    tableScrollableWrapper: "PlaygroundEditorTheme__tableScrollableWrapper",
+    tableSelected: "PlaygroundEditorTheme__tableSelected",
+    tableSelection: "PlaygroundEditorTheme__tableSelection",
   },
   onError: (error) => {
     console.error("Lexical Error:", error);
@@ -70,6 +85,14 @@ const initialConfig = {
 };
 
 export default function LexicalTextEditor() {
+  const [floatingAnchorElem, setFloatingAnchorElem] = useState(null);
+
+  const onRef = (_floatingAnchorElem) => {
+    if (_floatingAnchorElem !== null) {
+      setFloatingAnchorElem(_floatingAnchorElem);
+    }
+  };
+
   return (
     <div className="px-0.5 py-2 flex gap-2 h-screen">
       <LexicalComposer initialConfig={initialConfig}>
@@ -85,15 +108,17 @@ export default function LexicalTextEditor() {
           <div className="border p-2 rounded-md border-black relative w-3/4">
             <RichTextPlugin
               contentEditable={
-                <ContentEditable
-                  className="h-full focus-within:outline-none"
-                  aria-placeholder={"Enter some text..."}
-                  placeholder={
-                    <div className="absolute left-2 top-2">
-                      Enter some text...
-                    </div>
-                  }
-                />
+                <div className="editor" ref={onRef}>
+                  <ContentEditable
+                    className="h-full focus-within:outline-none"
+                    aria-placeholder={"Enter some text..."}
+                    placeholder={
+                      <div className="absolute left-2 top-2">
+                        Enter some text...
+                      </div>
+                    }
+                  />
+                </div>
               }
               ErrorBoundary={LexicalErrorBoundary}
             />
@@ -101,9 +126,18 @@ export default function LexicalTextEditor() {
           <AutoFocusPlugin />
           <HistoryPlugin />
           <ListPlugin />
-          <TablePlugin /> {/* Add the Lexical TablePlugin */}
-          {/* <TableSelectionPlugin /> Add table selection support */}
+          <TablePlugin />
           <ClearEditorPlugin />
+          <TableCellResizerPlugin />
+          <TableHoverActionsPlugin />
+          {/* {floatingAnchorElem && (
+            <>
+              <TableActionMenuPlugin
+                anchorElem={floatingAnchorElem}
+                cellMerge={true}
+              />
+            </>
+          )} */}
           <OnChangePlugin
             onChange={(editorState) => {
               console.log(editorState, "from the editor");

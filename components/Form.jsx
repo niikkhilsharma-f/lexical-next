@@ -3,7 +3,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { Button } from "./ui/button";
 import { useEffect } from "react";
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import { createEditor, $insertNodes, $getRoot } from "lexical";
+import { $insertNodes, $getRoot } from "lexical";
 import { toast } from "sonner";
 import { LoaderOne } from "./ui/loader";
 
@@ -21,7 +21,26 @@ export default function Form() {
         $getRoot().clear();
         const parser = new DOMParser();
         const dom = parser.parseFromString(htmlData.content, "text/html");
-        const nodes = $generateNodesFromDOM(editor, dom);
+        const nodes = $generateNodesFromDOM(editor, dom)
+          .map((node) => {
+            // Handle text nodes that need to be wrapped
+            if (node.getType() === "text") {
+              if (node.getTextContent().trim() === "") {
+                return null; // Remove empty text nodes
+              } else {
+                return $createParagraphNode().append(node);
+              }
+            }
+
+            // Remove line break nodes that can't be at root level
+            if (node.getType() === "linebreak") {
+              return null;
+            }
+
+            return node;
+          })
+          .filter((node) => !!node);
+
         $insertNodes(nodes);
       });
     }
