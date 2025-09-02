@@ -22,6 +22,10 @@ import Form from "../Form";
 import TableCellResizerPlugin from "./Plugins/TableCellResizer";
 import TableHoverActionsPlugin from "./Plugins/TableHoverActionsPlugin";
 import { useState } from "react";
+import PageBreakPlugin from "./Plugins/PageBreakPlugin";
+import { PageBreakNode } from "./nodes/PageBreakNode";
+import { TextNode } from "lexical";
+import { ExtendedTextNode } from "./nodes/ExtendedTextNode";
 // import TableActionMenuPlugin from "./Plugins/TableActionMenuPlugin";
 
 const initialConfig = {
@@ -73,6 +77,12 @@ const initialConfig = {
     console.error("Lexical Error:", error);
   },
   nodes: [
+    ExtendedTextNode,
+    {
+      replace: TextNode,
+      with: (node) => new ExtendedTextNode(node.__text),
+      withKlass: ExtendedTextNode,
+    },
     HeadingNode,
     ListNode,
     ListItemNode,
@@ -81,6 +91,7 @@ const initialConfig = {
     TableNode,
     TableCellNode,
     TableRowNode,
+    PageBreakNode,
   ],
 };
 
@@ -99,26 +110,25 @@ export default function LexicalTextEditor() {
         <TableContext>
           {" "}
           {/* Wrap with TableContext */}
-          <div className="flex flex-col w-1/4 border rounded-md">
+          <div className="flex flex-col w-1/5 border rounded-md">
             <ToolbarPlugin />
             <div className="flex flex-1 items-end m-2">
               <Form />
             </div>
           </div>
-          <div className="border p-2 rounded-md border-black relative w-3/4">
+          <div className="border p-2 rounded-md border-black relative w-4/5 overflow-hidden">
             <RichTextPlugin
               contentEditable={
-                <div className="editor" ref={onRef}>
-                  <ContentEditable
-                    className="h-full focus-within:outline-none"
-                    aria-placeholder={"Enter some text..."}
-                    placeholder={
-                      <div className="absolute left-2 top-2">
-                        Enter some text...
-                      </div>
-                    }
-                  />
-                </div>
+                <ContentEditable
+                  ref={onRef}
+                  className="focus-within:outline-none h-full overflow-scroll border border-black border-dotted"
+                  aria-placeholder={"Enter some text..."}
+                  placeholder={
+                    <div className="absolute left-2 top-2">
+                      Enter some text...
+                    </div>
+                  }
+                />
               }
               ErrorBoundary={LexicalErrorBoundary}
             />
@@ -128,6 +138,7 @@ export default function LexicalTextEditor() {
           <ListPlugin />
           <TablePlugin />
           <ClearEditorPlugin />
+          <PageBreakPlugin />
           <TableCellResizerPlugin />
           <TableHoverActionsPlugin />
           {/* {floatingAnchorElem && (

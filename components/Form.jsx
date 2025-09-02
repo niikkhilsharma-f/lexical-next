@@ -3,7 +3,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { Button } from "./ui/button";
 import { useEffect } from "react";
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import { $insertNodes, $getRoot } from "lexical";
+import { $insertNodes, $getRoot, $createParagraphNode } from "lexical";
 import { toast } from "sonner";
 import { LoaderOne } from "./ui/loader";
 
@@ -14,33 +14,15 @@ export default function Form() {
   useEffect(() => {
     async function getData(editor) {
       const data = await fetch("/api/save");
-      const htmlData = await data.json();
+      const htmlData = await data.text();
 
       editor.update(() => {
-        console.log(htmlData.content, "the html data from the server");
+        console.log(htmlData);
         $getRoot().clear();
         const parser = new DOMParser();
-        const dom = parser.parseFromString(htmlData.content, "text/html");
-        const nodes = $generateNodesFromDOM(editor, dom)
-          .map((node) => {
-            // Handle text nodes that need to be wrapped
-            if (node.getType() === "text") {
-              if (node.getTextContent().trim() === "") {
-                return null; // Remove empty text nodes
-              } else {
-                return $createParagraphNode().append(node);
-              }
-            }
-
-            // Remove line break nodes that can't be at root level
-            if (node.getType() === "linebreak") {
-              return null;
-            }
-
-            return node;
-          })
-          .filter((node) => !!node);
-
+        const dom = parser.parseFromString(htmlData, "text/html");
+        const nodes = $generateNodesFromDOM(editor, dom);
+        console.log(nodes);
         $insertNodes(nodes);
       });
     }
@@ -63,12 +45,15 @@ export default function Form() {
       });
 
       const result = await response.json();
+      if (!response.ok) {
+        throw new Error();
+      }
       toast.success("Content saved successfully!", {
         position: "bottom-right",
       });
       console.log("Success:", result);
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error:", error);
       toast.error("Failed to save content.");
     }
     setLoading(false);

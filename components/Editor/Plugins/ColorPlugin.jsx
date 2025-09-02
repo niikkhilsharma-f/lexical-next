@@ -42,7 +42,7 @@ export default function ColorPlugin() {
         "background",
         "#fff"
       );
-      console.log(color, backgroundColor, "colors");
+
       setColors({ color, backgroundColor });
     }
   };

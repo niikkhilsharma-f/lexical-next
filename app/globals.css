@@ -120,14 +120,7 @@
     @apply bg-background text-foreground;
   }
 }
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- *
- */
+
 .PlaygroundEditorTheme__paragraph {
   margin: 0;
   position: relative;
@@ -413,9 +406,9 @@
   A firefox workaround to allow scrolling of overflowing table cell
   ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1904159
 */
-.PlaygroundEditorTheme__tableCell > * {
+/* .PlaygroundEditorTheme__tableCell > * {
   overflow: inherit;
-}
+} */
 .PlaygroundEditorTheme__tableCellResizer {
   position: absolute;
   right: -4px;

@@ -56,6 +56,8 @@ import {
   $isTableSelection,
 } from "@lexical/table";
 import { InsertTableDialog } from "./TablePlugin";
+import { Scissors } from "react-bootstrap-icons";
+import { INSERT_PAGE_BREAK } from "./PageBreakPlugin";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -454,6 +456,14 @@ export default function ToolbarPlugin() {
         <ListPlugin blockType={blockType} setBlockType={setBlockType} />
 
         <InsertTableDialog activeEditor={activeEditor} onClose={() => {}} />
+
+        <Button
+          onClick={() => {
+            activeEditor.dispatchCommand(INSERT_PAGE_BREAK, undefined);
+          }}
+        >
+          <Scissors />
+        </Button>
 
         <Button
           variant={"outline"}
