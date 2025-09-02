@@ -458,6 +458,8 @@ export default function ToolbarPlugin() {
         <InsertTableDialog activeEditor={activeEditor} onClose={() => {}} />
 
         <Button
+          variant={"outline"}
+          size={"icon"}
           onClick={() => {
             activeEditor.dispatchCommand(INSERT_PAGE_BREAK, undefined);
           }}
