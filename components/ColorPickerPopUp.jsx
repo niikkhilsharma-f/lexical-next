@@ -26,12 +26,10 @@ const ColorPickerPopUp = ({ color, onColorChange, icon }) => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className={"p-0"}>
-        <DropdownMenuItem className="p-0">
-          <SketchPicker
-            color={color}
-            onChange={(color) => onColorChange(color.hex)}
-          />
-        </DropdownMenuItem>
+        <SketchPicker
+          color={color}
+          onChange={(color) => onColorChange(color.hex)}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

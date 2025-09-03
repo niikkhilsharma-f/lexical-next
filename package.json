@@ -45,6 +45,7 @@
     "embla-carousel-react": "^8.6.0",
     "handsontable": "^16.0.1",
     "input-otp": "^1.4.2",
+    "jsdom": "^26.1.0",
     "lucide-react": "^0.542.0",
     "motion": "^12.23.12",
     "next": "15.5.0",
@@ -60,6 +61,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
+    "wkhtmltopdf": "^0.4.0",
     "zod": "^4.1.4"
   },
   "devDependencies": {

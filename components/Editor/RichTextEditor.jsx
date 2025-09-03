@@ -26,9 +26,11 @@ import PageBreakPlugin from "./Plugins/PageBreakPlugin";
 import { PageBreakNode } from "./nodes/PageBreakNode";
 import { TextNode } from "lexical";
 import { ExtendedTextNode } from "./nodes/ExtendedTextNode";
+import { PDFBorderNode } from "./nodes/PDFBorderNode/PDFBorderNode";
+import PDFBorderPlugin from "./Plugins/PDFBorderPlugin/PDFBorderPlugin";
 // import TableActionMenuPlugin from "./Plugins/TableActionMenuPlugin";
 
-const initialConfig = {
+export const initialConfig = {
   nameSpace: "Rich Text Editor",
   theme: {
     heading: {
@@ -92,6 +94,7 @@ const initialConfig = {
     TableCellNode,
     TableRowNode,
     PageBreakNode,
+    PDFBorderNode,
   ],
 };
 
@@ -139,6 +142,7 @@ export default function LexicalTextEditor() {
           <TablePlugin />
           <ClearEditorPlugin />
           <PageBreakPlugin />
+          <PDFBorderPlugin />
           <TableCellResizerPlugin />
           <TableHoverActionsPlugin />
           {/* {floatingAnchorElem && (

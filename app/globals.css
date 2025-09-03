@@ -787,3 +787,47 @@
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+/* Add to your global CSS or styled component */
+.pdf-border-wrapper:hover {
+  border-color: #2563eb !important;
+}
+
+.pdf-border-content-editable:focus-within {
+  outline: none;
+}
+
+/* Ensure text formatting works inside the border */
+.pdf-border-content-editable strong {
+  font-weight: bold;
+}
+
+.pdf-border-content-editable em {
+  font-style: italic;
+}
+
+.pdf-border-content-editable u {
+  text-decoration: underline;
+}
+
+.pdf-border-content-editable h1,
+.pdf-border-content-editable h2,
+.pdf-border-content-editable h3 {
+  margin-bottom: 0.5rem;
+}
+
+.pdf-border-content-editable p {
+  margin-bottom: 0.5rem;
+}
+
+/* Print styles for actual PDF generation */
+@media print {
+  .pdf-border-wrapper {
+    margin: 0;
+    box-shadow: none;
+    border: 2px solid #000 !important;
+    page-break-after: always;
+    width: 100%;
+    max-width: none;
+  }
+}

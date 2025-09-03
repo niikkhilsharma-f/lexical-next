@@ -58,6 +58,8 @@ import {
 import { InsertTableDialog } from "./TablePlugin";
 import { Scissors } from "react-bootstrap-icons";
 import { INSERT_PAGE_BREAK } from "./PageBreakPlugin";
+import { FileImage } from "lucide-react";
+import { INSERT_PDF_BORDER_COMMAND } from "./PDFBorderPlugin/PDFBorderPlugin";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -466,6 +468,24 @@ export default function ToolbarPlugin() {
         >
           <Scissors />
         </Button>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                activeEditor.dispatchCommand(
+                  INSERT_PDF_BORDER_COMMAND,
+                  undefined
+                );
+              }}
+            >
+              <FileImage />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Insert PDF Border</TooltipContent>
+        </Tooltip>
 
         <Button
           variant={"outline"}

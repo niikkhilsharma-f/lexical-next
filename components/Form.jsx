@@ -66,7 +66,8 @@ export default function Form() {
         disabled={loading}
         onClick={() => {
           const html = editor.read((editorState) => {
-            return $generateHtmlFromNodes(editor, null);
+            const htmlString = $generateHtmlFromNodes(editor, null);
+            return htmlString.replace(/white-space:\s*pre-wrap;?/g, "");
           });
 
           console.log(html, "the html value");
