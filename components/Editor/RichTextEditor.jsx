@@ -9,71 +9,33 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { TablePlugin } from "@lexical/react/LexicalTablePlugin"; // Add this import
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
 import { css } from "@emotion/css";
-// Import your custom plugins
+import { useState, useEffect } from "react"; // Add useEffect
+import { RootNode, TextNode, $createParagraphNode } from "lexical"; // Add missing imports
+import { $createPageBreakNode } from "./nodes/PageBreakNode"; // Add this import
+
+// Your existing imports...
 import ToolbarPlugin from "./Plugins/ToolbarPlugin";
 import OnChangePlugin from "./Plugins/OnChangePlugin";
-import { TableContext } from "./Plugins/TablePlugin"; // Import the context
+import { TableContext } from "./Plugins/TablePlugin";
 import ClearEditorPlugin from "./Plugins/ClearEditorPlugin";
 import Form from "../Form";
 import TableCellResizerPlugin from "./Plugins/TableCellResizer";
 import TableHoverActionsPlugin from "./Plugins/TableHoverActionsPlugin";
-import { useState } from "react";
 import PageBreakPlugin from "./Plugins/PageBreakPlugin";
 import { PageBreakNode } from "./nodes/PageBreakNode";
-import { TextNode } from "lexical";
 import { ExtendedTextNode } from "./nodes/ExtendedTextNode";
 import { PDFBorderNode } from "./nodes/PDFBorderNode/PDFBorderNode";
 import PDFBorderPlugin from "./Plugins/PDFBorderPlugin/PDFBorderPlugin";
-// import TableActionMenuPlugin from "./Plugins/TableActionMenuPlugin";
+import { CustomParagraphNode } from "./nodes/CustomParagraphNode/CustomParagraphNode";
 
 export const initialConfig = {
-  nameSpace: "Rich Text Editor",
+  namespace: "Rich Text Editor", // Fixed typo: nameSpace -> namespace
   theme: {
-    heading: {
-      h1: "text-4xl font-extrabold tracking-tight text-balance",
-      h2: "text-3xl font-semibold tracking-tight",
-      h3: "text-2xl font-semibold tracking-tight",
-      h4: "text-xl font-semibold tracking-tight",
-      h5: "text-lg font-semibold tracking-tight",
-      h6: "text-base font-semibold tracking-tight",
-    },
-    list: {
-      ul: "my-6 ml-6 list-disc [&>li]:mt-2",
-      ol: "my-6 ml-6 list-decimal [&>li]:mt-2",
-    },
-    text: {
-      bold: css({ fontWeight: "bold" }),
-      underline: css({ textDecoration: "underline" }),
-      strikethrough: css({ textDecoration: "line-through" }),
-      underlineStrikethrough: css({ textDecoration: "underline line-through" }),
-      italic: css({ fontStyle: "italic" }),
-      code: "bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
-    },
-    // Add table theme with better styling
-    table: "PlaygroundEditorTheme__table",
-    tableAddColumns: "PlaygroundEditorTheme__tableAddColumns",
-    tableAddRows: "PlaygroundEditorTheme__tableAddRows",
-    tableAlignment: {
-      center: "PlaygroundEditorTheme__tableAlignmentCenter",
-      right: "PlaygroundEditorTheme__tableAlignmentRight",
-    },
-    tableCell: "PlaygroundEditorTheme__tableCell",
-    tableCellActionButton: "PlaygroundEditorTheme__tableCellActionButton",
-    tableCellActionButtonContainer:
-      "PlaygroundEditorTheme__tableCellActionButtonContainer",
-    tableCellHeader: "PlaygroundEditorTheme__tableCellHeader",
-    tableCellResizer: "PlaygroundEditorTheme__tableCellResizer",
-    tableCellSelected: "PlaygroundEditorTheme__tableCellSelected",
-    tableFrozenColumn: "PlaygroundEditorTheme__tableFrozenColumn",
-    tableFrozenRow: "PlaygroundEditorTheme__tableFrozenRow",
-    tableRowStriping: "PlaygroundEditorTheme__tableRowStriping",
-    tableScrollableWrapper: "PlaygroundEditorTheme__tableScrollableWrapper",
-    tableSelected: "PlaygroundEditorTheme__tableSelected",
-    tableSelection: "PlaygroundEditorTheme__tableSelection",
+    // Your existing theme...
   },
   onError: (error) => {
     console.error("Lexical Error:", error);
@@ -85,6 +47,7 @@ export const initialConfig = {
       with: (node) => new ExtendedTextNode(node.__text),
       withKlass: ExtendedTextNode,
     },
+    PageBreakNode, // Remove duplicate - only keep this one
     HeadingNode,
     ListNode,
     ListItemNode,
@@ -93,10 +56,53 @@ export const initialConfig = {
     TableNode,
     TableCellNode,
     TableRowNode,
-    PageBreakNode,
     PDFBorderNode,
+    CustomParagraphNode,
   ],
 };
+
+// Move this outside the component
+function calculateNodeHeight(node) {
+  // Simple height calculation - you may need to adjust this based on your styling
+  const nodeType = node.getType();
+  switch (nodeType) {
+    case "heading":
+      return 40;
+    case "paragraph":
+      return 20;
+    case "list":
+      return 25;
+    case "table":
+      return 100; // Approximate table height
+    default:
+      return 20;
+  }
+}
+
+// Hook should be outside component
+function usePaginationTransform(editor) {
+  useEffect(() => {
+    return editor.registerNodeTransform(RootNode, (rootNode) => {
+      const PAGE_HEIGHT = 800; // pixels
+      let currentHeight = 0;
+
+      const children = rootNode.getChildren();
+
+      children.forEach((child) => {
+        const childHeight = calculateNodeHeight(child);
+
+        if (currentHeight + childHeight > PAGE_HEIGHT) {
+          // Insert page break before this node
+          const pageBreak = $createPageBreakNode();
+          child.insertBefore(pageBreak);
+          currentHeight = childHeight;
+        } else {
+          currentHeight += childHeight;
+        }
+      });
+    });
+  }, [editor]);
+}
 
 export default function LexicalTextEditor() {
   const [floatingAnchorElem, setFloatingAnchorElem] = useState(null);
@@ -109,57 +115,53 @@ export default function LexicalTextEditor() {
 
   return (
     <div className="px-0.5 py-2 flex gap-2 h-screen">
-      <LexicalComposer initialConfig={initialConfig}>
-        <TableContext>
+      <div className="document">
+        <div className="page">
           {" "}
-          {/* Wrap with TableContext */}
-          <div className="flex flex-col w-1/5 border rounded-md">
-            <ToolbarPlugin />
-            <div className="flex flex-1 items-end m-2">
-              <Form />
-            </div>
-          </div>
-          <div className="border p-2 rounded-md border-black relative w-4/5 overflow-hidden">
-            <RichTextPlugin
-              contentEditable={
-                <ContentEditable
-                  ref={onRef}
-                  className="focus-within:outline-none h-full overflow-scroll border border-black border-dotted"
-                  aria-placeholder={"Enter some text..."}
-                  placeholder={
-                    <div className="absolute left-2 top-2">
-                      Enter some text...
-                    </div>
+          {/* Single page container */}
+          <LexicalComposer initialConfig={initialConfig}>
+            <TableContext>
+              <div className="flex flex-col w-1/5 border rounded-md">
+                <ToolbarPlugin />
+                <div className="flex flex-1 items-end m-2">
+                  <Form />
+                </div>
+              </div>
+              <div className="border p-2 rounded-md border-black relative w-4/5 overflow-hidden">
+                <RichTextPlugin
+                  contentEditable={
+                    <ContentEditable
+                      ref={onRef}
+                      className="focus-within:outline-none h-full overflow-scroll border border-black border-dotted"
+                      aria-placeholder={"Enter some text..."}
+                      placeholder={
+                        <div className="absolute left-2 top-2">
+                          Enter some text...
+                        </div>
+                      }
+                    />
                   }
+                  ErrorBoundary={LexicalErrorBoundary}
                 />
-              }
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-          </div>
-          <AutoFocusPlugin />
-          <HistoryPlugin />
-          <ListPlugin />
-          <TablePlugin />
-          <ClearEditorPlugin />
-          <PageBreakPlugin />
-          <PDFBorderPlugin />
-          <TableCellResizerPlugin />
-          <TableHoverActionsPlugin />
-          {/* {floatingAnchorElem && (
-            <>
-              <TableActionMenuPlugin
-                anchorElem={floatingAnchorElem}
-                cellMerge={true}
+              </div>
+              <AutoFocusPlugin />
+              <HistoryPlugin />
+              <ListPlugin />
+              <TablePlugin />
+              <ClearEditorPlugin />
+              <PageBreakPlugin />
+              <PDFBorderPlugin />
+              <TableCellResizerPlugin />
+              <TableHoverActionsPlugin />
+              <OnChangePlugin
+                onChange={(editorState) => {
+                  console.log(editorState, "from the editor");
+                }}
               />
-            </>
-          )} */}
-          <OnChangePlugin
-            onChange={(editorState) => {
-              console.log(editorState, "from the editor");
-            }}
-          />
-        </TableContext>
-      </LexicalComposer>
+            </TableContext>
+          </LexicalComposer>
+        </div>
+      </div>
     </div>
   );
 }

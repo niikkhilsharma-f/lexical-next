@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path, { resolve } from "path";
 import { JSDOM } from "jsdom";
-// import wkhtmltopdf from "wkhtmltopdf";
+
 const wkhtmltopdf = require("wkhtmltopdf");
 
 wkhtmltopdf.command = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
@@ -65,7 +65,7 @@ export async function POST(request) {
         "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
       const wkhtmlProcess = spawn(wkhtmltopdfPath, [
         "--page-size",
-        "A4",
+        "A3",
         "--orientation",
         "Portrait",
         filePath,

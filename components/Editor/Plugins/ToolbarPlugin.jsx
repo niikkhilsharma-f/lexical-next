@@ -33,6 +33,8 @@ import {
   UNDO_COMMAND,
   KEY_DOWN_COMMAND,
   COMMAND_PRIORITY_NORMAL,
+  $insertNodes,
+  $isNodeSelection,
 } from "lexical";
 import { mergeRegister, $getNearestNodeOfType } from "@lexical/utils";
 import { $createHeadingNode } from "@lexical/rich-text";
@@ -60,6 +62,10 @@ import { Scissors } from "react-bootstrap-icons";
 import { INSERT_PAGE_BREAK } from "./PageBreakPlugin";
 import { FileImage } from "lucide-react";
 import { INSERT_PDF_BORDER_COMMAND } from "./PDFBorderPlugin/PDFBorderPlugin";
+import {
+  $createCustomParagraphNode,
+  $isCustomParagraphNode,
+} from "../nodes/CustomParagraphNode/CustomParagraphNode";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -416,6 +422,40 @@ export default function ToolbarPlugin() {
     <div className="space-y-2 p-2">
       {/* Main toolbar */}
       <div className="flex gap-2 flex-wrap">
+        <Button
+          onClick={() => {
+            editor.update(() => {
+              const selection = $getSelection();
+              if (selection) {
+                const customParagraphNode = $createCustomParagraphNode();
+                $insertNodes([customParagraphNode]);
+              }
+            });
+          }}
+        >
+          CP
+        </Button>
+        <button
+          onClick={() => {
+            editor.update(() => {
+              // This works for both node and range selection inside paragraph node
+              const selection = $getSelection();
+              if (selection !== null) {
+                const nodes = selection.getNodes
+                  ? selection.getNodes()
+                  : [selection.anchor.getNode()];
+                nodes.forEach((node) => {
+                  if ($isCustomParagraphNode(node)) {
+                    node.getWritable().__bgColor = "blue";
+                  }
+                });
+              }
+            });
+          }}
+        >
+          Test
+        </button>
+
         <Select onValueChange={updateHeading}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={"Select Heading"} />
@@ -456,9 +496,7 @@ export default function ToolbarPlugin() {
         )}
         <ColorPlugin />
         <ListPlugin blockType={blockType} setBlockType={setBlockType} />
-
         <InsertTableDialog activeEditor={activeEditor} onClose={() => {}} />
-
         <Button
           variant={"outline"}
           size={"icon"}
@@ -468,7 +506,6 @@ export default function ToolbarPlugin() {
         >
           <Scissors />
         </Button>
-
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -486,7 +523,6 @@ export default function ToolbarPlugin() {
           </TooltipTrigger>
           <TooltipContent>Insert PDF Border</TooltipContent>
         </Tooltip>
-
         <Button
           variant={"outline"}
           size={"icon"}

@@ -17,10 +17,11 @@ export default function Form() {
       const htmlData = await data.text();
 
       editor.update(() => {
-        console.log(htmlData);
+        console.log(htmlData, "loaded data");
         $getRoot().clear();
         const parser = new DOMParser();
         const dom = parser.parseFromString(htmlData, "text/html");
+        console.log(dom);
         const nodes = $generateNodesFromDOM(editor, dom);
         console.log(nodes);
         $insertNodes(nodes);

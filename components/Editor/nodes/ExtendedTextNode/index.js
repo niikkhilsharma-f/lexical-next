@@ -41,6 +41,10 @@ export class ExtendedTextNode extends TextNode {
         conversion: patchStyleConversion(importers?.sup),
         priority: 1,
       }),
+      p: () => ({
+        conversion: patchStyleConversion(importers?.p),
+        priority: 1,
+      }),
     };
   }
 
